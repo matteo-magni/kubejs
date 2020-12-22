@@ -1,2 +1,5 @@
+.DS_Store
 react-image-compressor/
 logs/
+bin/
+kubefiles/
