@@ -1,0 +1,9 @@
+FROM node:latest
+
+WORKDIR /src
+
+COPY react-image-compressor .
+
+RUN npm install
+
+CMD [ "npm", "start" ]
