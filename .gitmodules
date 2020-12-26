@@ -1,0 +1,3 @@
+[submodule "react-image-compressor"]
+	path = react-image-compressor
+	url = https://github.com/RaulB-masai/react-image-compressor.git
