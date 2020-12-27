@@ -20,14 +20,14 @@ The `docker-compose.yml` file describes the Docker Compose environment, which ma
 
 For the sake of local kubernetes testing it's possible to use Minikube (https://minikube.sigs.k8s.io/), sourcing its docker environment variables in a terminal (by executing `eval $(minikube docker-env)` or `minikube docker-env | . /dev/stdin`), in order to build and make the Docker images available to Minikube.
 
-`make kapply` carries on a number of tasks:
+`make kapply` carries out a number of tasks:
 * it provides `konvert` for converting the `docker-compose.yml` file to YAML deployment and service files to feed Kubernetes with;
 * it provides `kubectl`, the swiss-army knife for dealing with Kubernetes;
 * it converts and applies the previously mentioned YAML files.
 
 `make ktest` forwards the nginx port to test the service from outside the Minikube platform, making it possible to browse http://localhost:8080 to take a look at the application.
 
-## Ingegration with AWS services and deployment to production
+## Integration with AWS services and deployment to production
 
 The `aws` folder contains some Terraform code that can build the infrastructure on AWS required to build and deploy the application to an existing Kubernetes cluster. Creating and operating such cluster is beyond the scope of this project.
 
