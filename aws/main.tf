@@ -89,7 +89,7 @@ resource "aws_codebuild_project" "project" {
   build_timeout   = "5"
   service_role    = aws_iam_role.role.arn
   badge_enabled   = true
-  source_version  = "prod-deploy"  # temporary during testing phase
+  source_version  = "master"
 
   source {
     type                  = "GITHUB"
