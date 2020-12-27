@@ -2,26 +2,27 @@ all: clean dbuild kube
 compose: clean dbuild up
 kube: kclean kapply
 
-gitdir ?= react-image-compressor
 os ?= $(shell uname -s | tr 'A-Z' 'a-z')
 
-clone:
-	@-rm -rf ${gitdir}
-	@git clone https://github.com/RaulB-masai/react-image-compressor.git ${gitdir}
+NGINX_REPO_NAME ?= nginx-proxy
+NODEJS_REPO_NAME ?= nodejs-react
+IMAGE_TAG ?= latest
+export
 
-dbuild: clone
+dprepare:
+	@eval "(echo 'cat <<DELIMITER' ; cat docker-compose.yml.tpl ; echo DELIMITER )" | sh > docker-compose.yml
+
+dbuild: dprepare
+	@git submodule init
+	@git submodule update
 	@docker-compose build
 
 up:
 	docker-compose up -d
+	@echo Local docker compose environment up. Please connect to http://localhost:8080
 
 down:
 	-docker-compose down
-
-clean: down kclean
-	@-rm -rf ${gitdir}
-	@-docker rmi nginx-proxy nodejs-react
-	@echo Docker environment cleaned up
 
 view-logs:
 	@docker-compose logs nginx
@@ -32,20 +33,20 @@ init-bin:
 	@[ ! -x bin/kubectl ] && curl -L -o bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/$(shell curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/${os}/amd64/kubectl" && chmod +x bin/kubectl || true
 	@echo Binaries ready
 
-kconvert: init-bin kclean
+kconvert: init-bin kclean dprepare
 	@mkdir -p kubefiles
 	@./bin/kompose convert -f docker-compose.yml -o kubefiles
 	@echo Kubernetes YAML files generated off the docker-compose.yml file
 
 kapply: kconvert
-	@find kubefiles -type f -name "*.yaml" | xargs -n1 ./bin/kubectl apply -f
+	@find kubefiles -type f -name "*.yaml" | xargs -r -n1 ./bin/kubectl apply -f
 	@echo Kubernetes YAML files applied
 
 kclean:
-	@-find kubefiles -type f -name "*.yaml" | xargs -n1 ./bin/kubectl delete -f
+	@-find kubefiles -type f -name "*.yaml" | xargs -r -n1 ./bin/kubectl delete -f
 	@-rm -rf kubefiles
 	@echo Kubernetes environment cleaned up
 
 ktest:
-	./bin/kubectl -n default port-forward deployment/nginx 8080
-
+	@echo Local kubernetes environment up. Please connect to http://localhost:8080
+	@./bin/kubectl -n default port-forward deployment/nginx 8080
